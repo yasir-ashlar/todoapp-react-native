@@ -3,6 +3,7 @@ package com.ashlarglobal.todoapp;
 import com.facebook.react.ReactActivity;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
+import io.invertase.firebase.config.RNFirebaseRemoteConfigPackage; 
 
 public class MainActivity extends ReactActivity {
 
@@ -20,7 +21,8 @@ public class MainActivity extends ReactActivity {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
           new RNFirebasePackage(),
-          new RNFirebaseFirestorePackage() // <-- Add this line
+          new RNFirebaseFirestorePackage(),
+          new RNFirebaseRemoteConfigPackage()
       );
     }
 }
