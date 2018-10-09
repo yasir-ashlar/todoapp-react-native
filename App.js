@@ -25,7 +25,7 @@ export default class App extends React.Component {
         </View>
         <View style={styles.body}>
           <FlatList
-          data={[{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},{key: 'Todo Item here!'}, {key: 'Todo Item here!'},]}
+          data={[{key: 'Todo Item here!'}, {key: 'Todo Item here!'}]}
           renderItem={({item}) => <Text style={styles.note}>{item.key}</Text>}
         />
         </View>

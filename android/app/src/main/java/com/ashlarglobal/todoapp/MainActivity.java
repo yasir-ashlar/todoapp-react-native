@@ -1,6 +1,8 @@
 package com.ashlarglobal.todoapp;
 
 import com.facebook.react.ReactActivity;
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 
 public class MainActivity extends ReactActivity {
 
@@ -11,5 +13,14 @@ public class MainActivity extends ReactActivity {
     @Override
     protected String getMainComponentName() {
         return "todoApp";
+    }
+
+    @Override
+    protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+          new MainReactPackage(),
+          new RNFirebasePackage(),
+          new RNFirebaseFirestorePackage() // <-- Add this line
+      );
     }
 }
