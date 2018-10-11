@@ -3,6 +3,7 @@ import { StyleSheet, Text } from 'react-native'
 import { Container, Button, Content, Form, Item, Input, Label } from 'native-base';
 // Your own deps
 import firebase from 'react-native-firebase'
+import MapView from 'react-native-maps';
 
 export default class TodoDetailScreen extends Component{
     constructor(props) {
@@ -55,7 +56,14 @@ export default class TodoDetailScreen extends Component{
                                 <Text>Update</Text>
                         </Button>
                     </Form>
-                    
+                    <MapView style={styles.map}
+                initialRegion={{
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+                }}
+            />
                 </Content>
             </Container>
         )
@@ -70,5 +78,9 @@ const styles = StyleSheet.create({
 
         alignItems: 'center'
         
+    },
+    map: {
+        height: 150,
+        width: '100%'
     }
 })
