@@ -1,9 +1,8 @@
 import React from 'react';
-import { StyleSheet, TextInput, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, TextInput, Text, View, FlatList, TouchableOpacity, ToastAndroid } from 'react-native';
 
 import firebase from 'react-native-firebase';
 
-import Header from '../Components/Header';
 import Todo from '../Components/Todo';
 
 export default class HomeScreen extends React.Component {
@@ -20,6 +19,25 @@ export default class HomeScreen extends React.Component {
 
   componentDidMount() {
     this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate)
+    this.watchID = navigator.geolocation.watchPosition(
+      
+      position => {
+        const { latitude, longitude } = position.coords;
+
+         this.setState({
+           latitude,
+           longitude
+         }, () => {
+          ToastAndroid.showWithGravity(
+            'Lat: ' + this.state.latitude + ' Long: ' + this.state.longitude,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER
+          );
+         });
+       },
+       error => console.log(error),
+       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0, distanceFilter: 1 }
+    );
   }
 
   componentWillUnmount() {

@@ -94,34 +94,35 @@ export default class TodoDetailScreen extends Component{
                             <Label>Title</Label>
                             <Input value={this.state.todoText} onChange={ () => this.setState({todoText: event.target.value})  } />
                         </Item>
-
-                        
-                            <Button onPress={() => this.openSearchModal() }>
-                                <Text>Update Location</Text>
-                            </Button>
-
-                         
                     </Form>
-                    <MapView style={styles.map}
-                        showUserLocation
-                        loadingEnabled
-                        region={{
-                            latitude: this.state.latitude,
-                            longitude: this.state.longitude,
-                            latitudeDelta: 0.0019,
-                            longitudeDelta: 0.0019,
-                        }}
-                    >
-                        <Marker 
-                            
-                            coordinate={{
-                                latitude: this.state.latitude,
-                                longitude: this.state.longitude                                                                                                                                                                                     
-                            }}
-                        />   
-                    </MapView>
 
-                    <Button style={styles.updateButton} onPress={this.updateTodoItem}>
+                    <Item stackedLabel>
+                        <Label>Map Location</Label>
+                        <MapView style={styles.map}
+                            zoomEnabled={false}
+                            zoomControlEnabled={false}
+                            rotateEnabled={false}
+                            scrollEnabled={false}
+                            pitchEnabled={false}
+                            region={{
+                                latitude: this.state.latitude,
+                                longitude: this.state.longitude,
+                                latitudeDelta: 0.0019,
+                                longitudeDelta: 0.0019,
+                            }}>
+                            <Marker 
+                                
+                                coordinate={{
+                                    latitude: this.state.latitude,
+                                    longitude: this.state.longitude                                                                                                                                                                                     
+                                }}
+                            />   
+                        </MapView>
+                    </Item>
+                    <Button block info style={styles.mTop10} onPress={() => this.openSearchModal() }>
+                        <Text>Update Location</Text>
+                    </Button>
+                    <Button block success style={styles.mTop10} onPress={this.updateTodoItem}>
                             <Text>Update</Text>
                     </Button>
                 </Content>
@@ -130,14 +131,8 @@ export default class TodoDetailScreen extends Component{
     }
 }
 const styles = StyleSheet.create({
-    updateButton: {
-        marginTop: 10, 
-        width: '100%',
-        backgroundColor: "#ea5a4b",
-        padding: 10,
-
-        alignItems: 'center'
-        
+    mTop10: {
+        marginTop: 10,
     },
     map: {
         height: 250,
