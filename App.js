@@ -1,19 +1,29 @@
 import React from 'react';
-import { StyleSheet, View} from 'react-native';
-import { createStackNavigator } from 'react-navigation';
-
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './app/Screens/HomeScreen'
 import TodoDetailScreen from './app/Screens/TodoDetailsScreen'
 
-const RootStack = createStackNavigator(
+const RootStack = createBottomTabNavigator(
   {
-    Home: HomeScreen,
-    TodoDetail: TodoDetailScreen
+    Home: {
+      screen: HomeScreen,
+      options: {
+        title: '',
+        tabBarIcon: <Ionicons name="ios-add-circle-outline" size={20} />
+      }
+    },
+    Actions: TodoDetailScreen,
+    navigationOptions: {
+      title: '',
+      tabBarIcon: <Ionicons name="ios-home-outline" size={20} />
+    }
   },
   {
     initialRouteName: 'Home',
   }
 );
+
 
 export default class App extends React.Component {
   render() {

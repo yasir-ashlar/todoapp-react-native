@@ -2,7 +2,8 @@ import React from 'react';
 import { StyleSheet, TextInput, Text, View, FlatList, TouchableOpacity, ToastAndroid } from 'react-native';
 
 import firebase from 'react-native-firebase';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Header from '../Components/Header';
 import Todo from '../Components/Todo';
 
 export default class HomeScreen extends React.Component {
@@ -31,7 +32,7 @@ export default class HomeScreen extends React.Component {
           ToastAndroid.showWithGravity(
             'Lat: ' + this.state.latitude + ' Long: ' + this.state.longitude,
             ToastAndroid.SHORT,
-            ToastAndroid.CENTER
+            ToastAndroid.BOTTOM
           );
          });
        },
@@ -84,13 +85,15 @@ export default class HomeScreen extends React.Component {
     });
   }
 
-  static navigationOptions = {
-    title: 'TodoApp'
-  }
+  // static navigationOptions = {
+  //   title: 'Home',
+  //   tabBarIcon: <Ionicons name="ios-home-outline" size={20} />
+  // }
 
   render() {
     return (
       <View style={styles.container}>
+        <Header />
         <View style={styles.body}>
           { this.state.todos ?
             <FlatList
@@ -99,19 +102,7 @@ export default class HomeScreen extends React.Component {
             /> : <Text>No Items Added to the list yet!</Text> 
           }
         </View>
-        <View style={styles.footer}>
-          <TextInput 
-            style={styles.addTodoText}
-            placeholder={'Add Todo Item'}
-            onChangeText={ (todoText) => this.setState({ todoText })}
-            value={ this.state.todoText }
-            />
-          <TouchableOpacity 
-            stlye={styles.addTodoButton}
-            onPress={() => this.addTodo()}>
-            <Text >Add</Text>
-          </TouchableOpacity>
-        </View>
+        
       </View>
     );
   }

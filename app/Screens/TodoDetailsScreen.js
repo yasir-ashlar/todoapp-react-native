@@ -1,22 +1,25 @@
 import React,{ Component }  from 'react'
 import { StyleSheet, Text, PermissionsAndroid } from 'react-native'
-import { Container, Button, Content, Form, Item, Input, Label } from 'native-base';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Container, Grid, Row, Col, Button, Content, Form, Item, Input, Label } from 'native-base';
 // Your own deps
 import firebase from 'react-native-firebase'
 import MapView, { Marker } from 'react-native-maps';
 import RNGooglePlaces from 'react-native-google-places'
+
+import Header from '../Components/Header'
 export default class TodoDetailScreen extends Component{
     constructor(props) {
         //Initial State stuff?
         super(props)
         const { navigation } = props;
-        let todoItem = navigation.getParam('todoItem')
-        const {text, key} = todoItem
+        let todoItem = navigation.getParam('todoItem');
         this.state = {
-            todoText: text,
-            todoID: key,
-            latitude: 0,
-            longitude: 0,
+            todoText: todoItem ? todoItem.text : '',
+            todoID: todoItem ? todoItem.key : '',
+            latitude: todoItem ? todoItem.latitude : 0 ,
+            longitude: todoItem ? todoItem.longitude : 0,
+            status: todoItem ? todoItem.status : 'pending'
         }
     }
 
@@ -29,9 +32,10 @@ export default class TodoDetailScreen extends Component{
             .catch((error) => alert(error.message));
         }
     }
-    static navigationOptions = {
-        title: 'Edit Todo Item'
-    }
+    // static navigationOptions = ({navigation}) => ({
+    //     title:  navigation.getParam('todoItem') ? 'Edit Todo Item' : 'Add Todo Item',
+    //     tabBarIcon: <Ionicons name="ios-add-circle-outline" size={20} />
+    // })
 
     requestLocationPermissions = async () => {
         try {
@@ -87,16 +91,20 @@ export default class TodoDetailScreen extends Component{
     render(){
        
         return(
+            
             <Container>
                 <Content>
+                <Header />
                     <Form>
-                        <Item floatingLabel>
+                        <Item stackedLabel>
                             <Label>Title</Label>
-                            <Input value={this.state.todoText} onChange={ () => this.setState({todoText: event.target.value})  } />
+                            <Input 
+                                value={this.state.todoText} 
+                                onChange={ this.handleTextChange.bind(this) } />
                         </Item>
                     </Form>
 
-                    <Item stackedLabel>
+                    <Item stackedLabel style={styles.mapContainer}>
                         <Label>Map Location</Label>
                         <MapView style={styles.map}
                             zoomEnabled={false}
@@ -119,12 +127,20 @@ export default class TodoDetailScreen extends Component{
                             />   
                         </MapView>
                     </Item>
-                    <Button block info style={styles.mTop10} onPress={() => this.openSearchModal() }>
-                        <Text>Update Location</Text>
-                    </Button>
-                    <Button block success style={styles.mTop10} onPress={this.updateTodoItem}>
-                            <Text>Update</Text>
-                    </Button>
+                    <Grid>
+                        <Row>
+                            <Col>
+                                <Button block info style={styles.mx10} onPress={() => this.openSearchModal() }>
+                                    <Text>Update Location</Text>
+                                </Button>
+                            </Col>
+                            <Col>
+                                <Button block success style={styles.mx10} onPress={this.updateTodoItem}>
+                                    <Text>Update</Text>
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Grid>
                 </Content>
             </Container>
         )
@@ -133,6 +149,13 @@ export default class TodoDetailScreen extends Component{
 const styles = StyleSheet.create({
     mTop10: {
         marginTop: 10,
+    },
+    mx10: {
+        margin: 10
+    },
+    mapContainer: {
+        marginTop: 20,
+        marginBottom: 20
     },
     map: {
         height: 250,

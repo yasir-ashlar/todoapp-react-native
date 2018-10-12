@@ -160,8 +160,9 @@ dependencies {
       exclude group: 'com.google.android.gms', module: 'play-services-maps'
   }
 
-   implementation "com.google.android.gms:play-services-base:15.0.1"
+  implementation "com.google.android.gms:play-services-base:15.0.1"
   implementation "com.google.android.gms:play-services-maps:15.0.0"
+  implementation 'com.google.android.gms:play-services-places:15.0.1'
 
   implementation(project(':react-native-firebase')) {
     transitive = false
