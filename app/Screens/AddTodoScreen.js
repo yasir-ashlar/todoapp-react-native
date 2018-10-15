@@ -7,30 +7,31 @@ import firebase from 'react-native-firebase'
 import MapView, { Marker } from 'react-native-maps';
 import RNGooglePlaces from 'react-native-google-places'
 
-
-export default class TodoDetailScreen extends Component{
+export default class AddTodoScreen extends Component{
     constructor(props) {
         //Initial State stuff?
         super(props)
-        const { navigation } = props;
-        let todoItem = navigation.getParam('todoItem');
-        const { latitude, longitude } = todoItem.location;
         this.state = {
-            todoText: todoItem.text,
-            todoID: todoItem.key,
-            latitude,
-            longitude,
-            status: todoItem.status
+            todoText: '',
+            latitude: 0 ,
+            longitude: 0,
+            status: 'pending'
         }
     }
 
     componentDidMount() {
+        canUseLocation = this.requestLocationPermissions();
         
+        if(canUseLocation){
+            RNGooglePlaces.getCurrentPlace()
+            .then((results) => { this.setState({ latitude: results[0].latitude, longitude: results[0].longitude}) })
+            .catch((error) => alert(error.message));
+        }
     }
-    // static navigationOptions = ({navigation}) => ({
-    //     title:  navigation.getParam('todoItem') ? 'Edit Todo Item' : 'Add Todo Item',
-    //     tabBarIcon: <Ionicons name="ios-add-circle-outline" size={20} />
-    // })
+    static navigationOptions = ({navigation}) => ({
+        title: 'Add Todo Item',
+        tabBarIcon: <Ionicons name="ios-add-circle-outline" size={20} />
+    })
 
     requestLocationPermissions = async () => {
         try {
@@ -52,32 +53,22 @@ export default class TodoDetailScreen extends Component{
         }
       }
 
-    updateTodoItem = () => {
+      addTodoItem = () => {
         const { navigation } = this.props;
 
         let date = new Date();
         date = date.getFullYear()+'/'+(date.getMonth() + 1)+'/'+date.getDate();
         firebase.firestore().collection('todos').doc(this.state.todoID).set({
             text: this.state.todoText,
-            date,
-            location: {
-                latitude: this.state.latitude,
-                longitude: this.state.longitude
-            }
+            date: date,
+            location: {'latitude' : this.state.latitude, 'longitude': this.state.longitude},
         });
         navigation.navigate('Home');
-    }
-
-    handleTextChange(event){
-        this.setState({todoText: event.target.value})
     }
 
     openSearchModal() {
         RNGooglePlaces.openPlacePickerModal()
         .then((place) => {
-            // alert(JSON.parse(place));
-            // place represents user's selection from the
-            // suggestions and it is a simplified Google Place object.
             const {latitude, longitude} = place; 
             this.setState({
                 latitude,
@@ -94,11 +85,11 @@ export default class TodoDetailScreen extends Component{
             <Container>
                 <Content>
                     <Form>
-                        <Item stackedLabel>
+                        <Item floatingLabel>
                             <Label>Title</Label>
                             <Input 
                                 value={this.state.todoText} 
-                                onChange={ this.handleTextChange.bind(this) } />
+                                onChangeText={ (todoText) => this.setState({ todoText }) } />
                         </Item>
                     </Form>
 
@@ -132,8 +123,8 @@ export default class TodoDetailScreen extends Component{
                                 </Button>
                             </Col>
                             <Col>
-                                <Button block success style={styles.mx10} onPress={this.updateTodoItem}>
-                                    <Text>Update</Text>
+                                <Button block success style={styles.mx10} onPress={this.addTodoItem}>
+                                    <Text>Save</Text>
                                 </Button>
                             </Col>
                         </Row>

@@ -1,10 +1,12 @@
 import React from 'react';
 import { StyleSheet, TextInput, Text, View, FlatList, TouchableOpacity, ToastAndroid } from 'react-native';
 
+import { NavigationActions } from 'react-navigation'
 import firebase from 'react-native-firebase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Header from '../Components/Header';
 import Todo from '../Components/Todo';
+
+import { stackNavigation } from '../../App';
 
 export default class HomeScreen extends React.Component {
   constructor(props) {
@@ -48,11 +50,12 @@ export default class HomeScreen extends React.Component {
   onCollectionUpdate = (querySnapshot) => {
     const todos = [];
     querySnapshot.forEach((todo) => {
-      const { text, date } = todo.data();
+      const { text, date, location } = todo.data();
       todos.push({
         key: todo.id, // Todo ID
         todo,
         text,
+        location,
         date
       });
     });
@@ -79,21 +82,18 @@ export default class HomeScreen extends React.Component {
   }
 
   updateTodo = (todoItem) => {
-    const { navigation } = this.props;
-    navigation.navigate('TodoDetail', {
-      todoItem
-    });
+    const navigateAction = NavigationActions.navigate({routeName: 'EditTodo', 'params': { todoItem } });
+    this.props.navigation.dispatch(navigateAction);
   }
 
-  // static navigationOptions = {
-  //   title: 'Home',
-  //   tabBarIcon: <Ionicons name="ios-home-outline" size={20} />
-  // }
+  static navigationOptions = {
+    title: 'Home',
+    tabBarIcon: <Ionicons name="ios-home-outline" size={20} />
+  }
 
   render() {
     return (
       <View style={styles.container}>
-        <Header />
         <View style={styles.body}>
           { this.state.todos ?
             <FlatList
@@ -102,7 +102,6 @@ export default class HomeScreen extends React.Component {
             /> : <Text>No Items Added to the list yet!</Text> 
           }
         </View>
-        
       </View>
     );
   }
@@ -114,7 +113,6 @@ const styles = StyleSheet.create({
   },
   body: {
     backgroundColor: '#dedede',
-    marginBottom:60
   },
   footer: {
     position: "absolute",
