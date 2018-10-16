@@ -68,9 +68,6 @@ export default class TodoDetailScreen extends Component{
         navigation.navigate('Home');
     }
 
-    handleTextChange(event){
-        this.setState({todoText: event.target.value})
-    }
 
     openSearchModal() {
         RNGooglePlaces.openPlacePickerModal()
@@ -98,7 +95,7 @@ export default class TodoDetailScreen extends Component{
                             <Label>Title</Label>
                             <Input 
                                 value={this.state.todoText} 
-                                onChange={ this.handleTextChange.bind(this) } />
+                                onChangeText={ (todoText) => this.setState({ todoText }) } />
                         </Item>
                     </Form>
 
