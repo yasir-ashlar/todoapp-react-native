@@ -53,39 +53,16 @@ export default class HomeScreen extends React.Component {
            this.setState({
              latitude,
              longitude
-           }, () => {
-            ToastAndroid.showWithGravity(
-              'Lat: ' + this.state.latitude + ' Long: ' + this.state.longitude,
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM
-            );
-              let startLocation = {latitude: this.state.latitude, longitude: this.state.longitude};
-              const { location } = this.state.nearest;
-              currentDistance = haversine(startLocation, {latitude});
-              
-              if(currentDistance > 0){
-                if(this.state.currentDistance != currentDistance){
-                  this.setState({
-                    'prevDistance': this.state.currentDistance,
-                    currentDistance
-                  })
-                }
-                let direction = '';
-                if(this.state.currentDistance > this.state.prevDistance){
-                  direction = 'againsT!'
-                } else {
-                  direction = 'towards'
-                }
-                ToastAndroid.showWithGravity(
-                  `Current Distance:  ${currentDistance}. You are moving - ${direction}`,
-                  ToastAndroid.SHORT,
-                  ToastAndroid.BOTTOM
-                );
-              }
            });
+           ToastAndroid.showWithGravity(
+            `Lat: ${this.state.latitude} Long: ${this.state.longitude}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+           this.calculateDistance()
          },
          error => console.log(error),
-         { enableHighAccuracy: true, timeout: 20000, maximumAge: 0, distanceFilter: 5 }
+         { enableHighAccuracy: true, timeout: 20000, maximumAge: 0, distanceFilter: 1 }
       );
     } else {
       ToastAndroid.showWithGravity(
@@ -95,6 +72,34 @@ export default class HomeScreen extends React.Component {
       );
     }
   }
+
+  calculateDistance =() => {
+    // Check if nearest item has been set or not? 
+    let { text, location} = this.state.nearest;
+     if(!text || !location){
+        this.calculateNearest({
+          lat: this.state.latitude,
+          lng: this.state.longitude
+        }, this.state.todos);
+     }
+     //Now, the distance calculation, on the move
+     let { nearest } = this.state
+     currentDistance = haversine({lat: this.state.latitude, lng: this.state.longitude}, {lat: nearest.location.latitude, lng: nearest.location.longitude})
+
+     if(currentDistance > 0 ){
+       ToastAndroid.showWithGravity(
+         `Current Distance: ${currentDistance}.`,
+         ToastAndroid.SHORT,
+         ToastAndroid.BOTTOM
+       )
+     } else {
+       ToastAndroid.showWithGravity(
+         'Looks like distance is negative!',
+         ToastAndroid.SHORT,
+         ToastAndroid.BOTTOM
+       )
+     }
+   }
 
   componentWillUnmount() {
     this.unsubscribe();
@@ -124,7 +129,7 @@ export default class HomeScreen extends React.Component {
    });
   }
 
-  calculateNearest(currentLocation, listOfLocations){
+  calculateNearest = (currentLocation, listOfLocations) => {
     let distances = [], nearest = '';
     for(item of listOfLocations){
       if(item.location && (item.location.latitude && item.location.longitude)){
@@ -153,23 +158,13 @@ export default class HomeScreen extends React.Component {
           ToastAndroid.BOTTOM
         );
       })
+    } else {
+      ToastAndroid.showWithGravity(
+        'You Missed Something!',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
     }
-  }
-
-  addTodo = () => {
-    if(this.state.todoText == ''){
-      alert('Please type in your todo item!')
-      return;
-    }
-    date = new Date();
-    date = date.getFullYear()+'/'+(date.getMonth() + 1)+'/'+date.getDate();
-    this.ref.add({
-      text: this.state.todoText,
-      date
-    });
-    this.setState({
-      todoText: ''
-    })
   }
 
   updateTodo = (todoItem) => {
