@@ -1,9 +1,12 @@
 import React from 'react';
+import { YellowBox } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './app/Screens/HomeScreen'
 import TodoDetailScreen from './app/Screens/TodoDetailsScreen'
 import AddTodoScreen from './app/Screens/AddTodoScreen';
+
+
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 const bottomTabBar = createBottomTabNavigator(
   {

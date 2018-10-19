@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, TextInput, Text, View, FlatList, TouchableOpacity, PermissionsAndroid,  ToastAndroid } from 'react-native';
-
 import { NavigationActions } from 'react-navigation'
 import firebase from 'react-native-firebase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import Config from '../Config';
 import Todo from '../Components/Todo';
 import haversine from 'haversine-distance';
 
@@ -21,7 +22,8 @@ export default class HomeScreen extends React.Component {
       prevDistance: 0,
       currentDistance: 0,
     };
-  }
+}
+
   requestLocationPermissions = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -43,61 +45,70 @@ export default class HomeScreen extends React.Component {
   }
   componentDidMount() {
     this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate)
-    accessToLocation = this.requestLocationPermissions();
-    if(accessToLocation){
-      this.watchID = navigator.geolocation.watchPosition(
-      
-        position => {
-          const { latitude, longitude } = position.coords;
-
-           this.setState({
-             latitude,
-             longitude
-           });
-           ToastAndroid.showWithGravity(
-            `Lat: ${this.state.latitude} Long: ${this.state.longitude}`,
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM
-          );
-           this.calculateDistance()
-         },
-         error => console.log(error),
-         { enableHighAccuracy: true, timeout: 20000, maximumAge: 0, distanceFilter: 1 }
-      );
-    } else {
-      ToastAndroid.showWithGravity(
-        'Sorry, Can\'t access location',
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM
-      );
-    }
+    this.requestLocationPermissions().then((accessToLocation) => {
+      if(accessToLocation){
+        this.watchID = navigator.geolocation.watchPosition(
+        
+          position => {
+            const { latitude, longitude } = position.coords;
+  
+             this.setState({
+               latitude,
+               longitude
+             });
+             ToastAndroid.showWithGravity(
+              `Lat: ${this.state.latitude} Long: ${this.state.longitude}`,
+              ToastAndroid.SHORT,
+              ToastAndroid.BOTTOM
+            );
+             this.calculateDistance();
+           },
+           error => console.log(error),
+           { enableHighAccuracy: false, timeout: 20000, maximumAge: 0, distanceFilter: 1 }
+        );
+      } else {
+        ToastAndroid.showWithGravity(
+          'Sorry, Can\'t access location',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    })
   }
 
-  calculateDistance =() => {
+  calculateDistance = () => {
     // Check if nearest item has been set or not? 
-    let { text, location} = this.state.nearest;
-     if(!text || !location){
+    let { location} = this.state.nearest;
+     if(!location){
         this.calculateNearest({
           lat: this.state.latitude,
           lng: this.state.longitude
         }, this.state.todos);
      }
      //Now, the distance calculation, on the move
-     let { nearest } = this.state
+     let { nearest, prevDistance } = this.state
+     if(!nearest.location) { return }
      currentDistance = haversine({lat: this.state.latitude, lng: this.state.longitude}, {lat: nearest.location.latitude, lng: nearest.location.longitude})
 
      if(currentDistance > 0 ){
-       ToastAndroid.showWithGravity(
-         `Current Distance: ${currentDistance}.`,
-         ToastAndroid.SHORT,
-         ToastAndroid.BOTTOM
-       )
-     } else {
-       ToastAndroid.showWithGravity(
-         'Looks like distance is negative!',
-         ToastAndroid.SHORT,
-         ToastAndroid.BOTTOM
-       )
+        // If moving away, recalculate the nearest task
+        if(currentDistance > prevDistance && (currentDistance - prevDistance >= 5)){
+          
+          ToastAndroid.showWithGravity('Moving away? Recalculating!', ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+
+          this.calculateNearest({lat: this.state.latitude, lng: this.state.longitude}, this.state.todos);
+          this.calculateDistance();
+        }  
+      console.log('Current Distance : ' +  currentDistance);
+         
+       if(currentDistance < 50){
+        ToastAndroid.showWithGravity(
+          'Almost Near completion!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        )  
+        //Mark Item as complete!
+       }
      }
    }
 
@@ -130,6 +141,8 @@ export default class HomeScreen extends React.Component {
   }
 
   calculateNearest = (currentLocation, listOfLocations) => {
+    if(!currentLocation.lat || !currentLocation.lng) return;
+
     let distances = [], nearest = '';
     for(item of listOfLocations){
       if(item.location && (item.location.latitude && item.location.longitude)){
