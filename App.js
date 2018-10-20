@@ -5,7 +5,6 @@ import HomeScreen from './app/Screens/HomeScreen'
 import TodoDetailScreen from './app/Screens/TodoDetailsScreen'
 import AddTodoScreen from './app/Screens/AddTodoScreen';
 
-
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
 
 const bottomTabBar = createBottomTabNavigator(
@@ -30,6 +29,7 @@ export const RootStack = createStackNavigator({
 
 
 export default class App extends React.Component {
+
   render() {
     return <RootStack />;
   }

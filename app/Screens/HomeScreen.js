@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, TextInput, Text, View, FlatList, TouchableOpacity, PermissionsAndroid,  ToastAndroid } from 'react-native';
+import { StyleSheet, DeviceEventEmitter, Text, View, FlatList, TouchableOpacity, PermissionsAndroid,  ToastAndroid } from 'react-native';
 import { NavigationActions } from 'react-navigation'
 import firebase from 'react-native-firebase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import GeoLocation from '../Modules/GeoLocation'
 
-import Config from '../Config';
 import Todo from '../Components/Todo';
 import haversine from 'haversine-distance';
 
@@ -17,11 +17,30 @@ export default class HomeScreen extends React.Component {
       todos: [],
       loading: true,
       canAccessLocation: false,
-      todoText: '',
+      todoText: '',                                                                                                 
       nearest: '',
       prevDistance: 0,
       currentDistance: 0,
-    };
+
+    }; 
+    
+    GeoLocation.startService()
+    .then((res) => {
+      if(res == 'Success'){
+        ToastAndroid.showWithGravity('Service Initiated!', ToastAndroid.SHORT, ToastAndroid.CENTER)
+      }
+    })
+    .catch(error => console.log(error));
+    
+    // NativeModules.GeoLocationModule;
+    DeviceEventEmitter.addListener("updateLocation", (geoData) => {
+      console.log(geoData);
+      ToastAndroid(`GeoData Recieved from device!  ${geoData.timestamp} ${geoData.coords.latitude}`, ToastAndroid.SHORT, ToastAndroid.CENTER)
+    });
+
+    DeviceEventEmitter.addListener("GeoLocationUpdate", (data) => {
+      console.log(data);
+    })
 }
 
   requestLocationPermissions = async () => {
@@ -45,35 +64,7 @@ export default class HomeScreen extends React.Component {
   }
   componentDidMount() {
     this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate)
-    this.requestLocationPermissions().then((accessToLocation) => {
-      if(accessToLocation){
-        this.watchID = navigator.geolocation.watchPosition(
-        
-          position => {
-            const { latitude, longitude } = position.coords;
-  
-             this.setState({
-               latitude,
-               longitude
-             });
-             ToastAndroid.showWithGravity(
-              `Lat: ${this.state.latitude} Long: ${this.state.longitude}`,
-              ToastAndroid.SHORT,
-              ToastAndroid.BOTTOM
-            );
-             this.calculateDistance();
-           },
-           error => console.log(error),
-           { enableHighAccuracy: false, timeout: 20000, maximumAge: 0, distanceFilter: 1 }
-        );
-      } else {
-        ToastAndroid.showWithGravity(
-          'Sorry, Can\'t access location',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-      }
-    })
+    this.requestLocationPermissions().then((accessToLocation) => console.log(accessToLocation)).catch(e => console.log(e))
   }
 
   calculateDistance = () => {

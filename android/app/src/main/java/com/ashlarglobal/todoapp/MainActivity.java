@@ -7,7 +7,6 @@ import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 import io.invertase.firebase.config.RNFirebaseRemoteConfigPackage;
 
-
 import java.util.Arrays;
 import java.util.List;
 

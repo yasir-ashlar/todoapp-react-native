@@ -29,6 +29,7 @@
     "react-native-firebase": "^4.3.6",
     "react-native-google-places": "^2.5.2",
     "react-native-maps": "^0.21.0",
+    "react-native-tailwind": "^1.0.3",
     "react-navigation": "^2.17.0"
   }
 }
